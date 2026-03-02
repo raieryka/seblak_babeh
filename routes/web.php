@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Menu;
-use App\Models\Topping;
+use App\Http\Controllers\MenuController;
 
-Route::get('/', function () {
-    $menu = Menu::all();
-    $topping = Topping::all();
-    return view('home', compact('menu','topping'));
-});
+Route::get('/', [MenuController::class, 'index']);
+Route::get('/menu/{id}', [MenuController::class, 'show']);
+Route::post('/cart/add', [MenuController::class, 'addToCart']);
+Route::get('/cart', [MenuController::class, 'cart']);
+
+Route::get('/checkout', [MenuController::class, 'checkout']);
+Route::post('/checkout/process', [MenuController::class, 'processCheckout']);
