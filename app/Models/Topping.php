@@ -21,4 +21,11 @@ class Topping extends Model
     {
         return $this->hasMany(DetailTopping::class, 'id_topping');
     }
+
+    protected $fillable = [
+    'nama_topping',
+    'harga',
+    'gambar',
+    'id_penjual'
+    ];
 }

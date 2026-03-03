@@ -63,10 +63,10 @@
         <div class="col-md-4 mb-4">
             <div class="card shadow">
 
-                <!-- Gambar Menu -->
-                <img src="{{ asset('menu/' . $m->gambar) }}" 
-                     style="height:220px; object-fit:cover;">
-
+               <!-- Gambar Menu -->
+<img src="{{ asset('images/' . $m->gambar) }}" 
+     style="height:220px; object-fit:cover;">
+     
                 <div class="card-body text-dark">
 
                     <h5 class="card-title fw-bold">
