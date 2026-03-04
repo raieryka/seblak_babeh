@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pesanan;
 use App\Models\DetailPesanan;
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
+    public function __construct()
+    {
+        // WAJIB LOGIN UNTUK SEMUA METHOD
+
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $cart = session()->get('cart', []);
@@ -24,7 +32,7 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
 
-        if(empty($cart)){
+        if (empty($cart)) {
             return redirect('/')->with('error', 'Keranjang kosong!');
         }
 
@@ -33,8 +41,9 @@ class CheckoutController extends Controller
             $total += $item['subtotal'];
         }
 
-        // SIMPAN KE TABEL PESANAN
+        // SIMPAN KE TABEL PESANAN (TAMBAH user_id)
         $pesanan = Pesanan::create([
+            'user_id' => Auth::id(), // 🔥 penting banget
             'nama_pelanggan' => $request->nama_pelanggan,
             'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
@@ -46,9 +55,9 @@ class CheckoutController extends Controller
         // SIMPAN DETAIL PESANAN
         foreach ($cart as $item) {
             DetailPesanan::create([
-                'id_pesanan' => $pesanan->id_pesanan,
+                'id_pesanan' => $pesanan->id,
                 'id_menu' => $item['id_menu'],
-                'topping' => $item['topping'] ?? null,
+                'topping' => isset($item['topping']) ? json_encode($item['topping']) : null,
                 'jumlah' => $item['jumlah'],
                 'subtotal' => $item['subtotal'],
             ]);
@@ -56,15 +65,25 @@ class CheckoutController extends Controller
 
         session()->forget('cart');
 
-        // REDIRECT KE HALAMAN SUKSES
-        return redirect()->route('checkout.sukses', $pesanan->id_pesanan);
+        return redirect()->route('checkout.sukses', $pesanan->id);
     }
 
     public function sukses($id)
     {
         $pesanan = Pesanan::with('detailPesanan.menu')
+                    ->where('user_id', Auth::id()) // 🔥 biar ga bisa buka pesanan orang lain
                     ->findOrFail($id);
 
         return view('checkout_sukses', compact('pesanan'));
+    }
+
+    // 🔥 TAMBAHAN FITUR RIWAYAT
+    public function riwayat()
+    {
+        $pesanans = Pesanan::where('user_id', Auth::id())
+                    ->latest()
+                    ->get();
+
+        return view('riwayat', compact('pesanans'));
     }
 }
