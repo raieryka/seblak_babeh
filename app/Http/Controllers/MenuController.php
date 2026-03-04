@@ -112,4 +112,41 @@ class MenuController extends Controller
 
         return redirect('/')->with('success', 'Pesanan berhasil dibuat!');
     }
+    public function removeCart($index)
+{
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$index])) {
+        unset($cart[$index]);
+    }
+
+    // rapikan index array
+    $cart = array_values($cart);
+
+    session()->put('cart', $cart);
+
+    return redirect()->back();
+}
+public function clearCart()
+{
+    session()->forget('cart');
+
+    return redirect()->back();
+}
+
+public function removeFromCart($index)
+{
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$index])) {
+        unset($cart[$index]);
+    }
+
+    // rapihin ulang index array
+    $cart = array_values($cart);
+
+    session()->put('cart', $cart);
+
+    return redirect('/cart')->with('success', 'Item berhasil dihapus');
+}
 }
