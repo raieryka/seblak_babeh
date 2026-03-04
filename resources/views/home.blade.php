@@ -79,7 +79,7 @@
 
                     <a href="/menu/{{ $m->id_menu }}" 
                        class="btn btn-merah w-100">
-                        <i class="bi bi-eye-fill"></i> Lihat Menu
+                        <i class="bi bi-eye-fill"></i> Tambah Keranjang
                     </a>
 
                 </div>

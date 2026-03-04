@@ -13,16 +13,23 @@ class Menu extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id_penjual',
         'nama_menu',
         'harga_dasar',
-        'id_penjual'
+        'deskripsi',
+        'status',
+        'stok',
+        'gambar',
+        'is_custom'
     ];
 
+    // Relasi ke penjual
     public function penjual()
     {
         return $this->belongsTo(Penjual::class, 'id_penjual');
     }
 
+    // Relasi ke detail pesanan
     public function detailPesanan()
     {
         return $this->hasMany(DetailPesanan::class, 'id_menu');
