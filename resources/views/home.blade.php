@@ -53,7 +53,7 @@
 
     <!-- Hero -->
     <div class="text-center mb-5">
-        <h1 class="fw-bold">Seblak Prasmanan Pedas</h1>
+        <h1 class="fw-bold">Seblak Prasmanan Babeh</h1>
         <p>Pilih menu favorit kamu sekarang juga!</p>
     </div>
 
