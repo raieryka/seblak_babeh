@@ -11,7 +11,6 @@
 
     <h2 class="mb-4">🛒 Checkout</h2>
 
-    {{-- RINGKASAN PESANAN --}}
     <div class="card bg-danger text-white mb-4">
         <div class="card-body">
             <h5>Ringkasan Pesanan</h5>
@@ -19,10 +18,13 @@
 
             @forelse($cart as $item)
                 <p>
-                    <strong>{{ $item['nama_menu'] ?? '-' }}</strong><br>
+                    <strong>{{ $item['nama_menu'] ?? '' }}</strong><br>
 
+                    {{-- TAMPILKAN TOPPING --}}
                     @if(!empty($item['topping']))
-                        Topping: {{ $item['topping'] }}<br>
+                        Topping:
+                        {{ collect($item['topping'])->pluck('nama_topping')->implode(', ') }}
+                        <br>
                     @endif
 
                     Jumlah: {{ $item['jumlah'] ?? 1 }}<br>
@@ -37,7 +39,6 @@
         </div>
     </div>
 
-    {{-- FORM DATA PEMBELI --}}
     <form action="{{ route('checkout.proses') }}" method="POST">
         @csrf
 

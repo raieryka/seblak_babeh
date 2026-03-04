@@ -31,11 +31,13 @@ class MenuController extends Controller
     }
 
     // ======================
-    // TAMBAH KE CART (SESSION)
+    // TAMBAH KE CART
     // ======================
     public function addToCart(Request $request)
     {
         $menu = Menu::findOrFail($request->id_menu);
+
+        // ambil topping yang dipilih
         $toppings = Topping::whereIn('id_topping', $request->topping ?? [])->get();
 
         $cart = session()->get('cart', []);
@@ -47,7 +49,8 @@ class MenuController extends Controller
             'id_menu' => $menu->id_menu,
             'nama_menu' => $menu->nama_menu,
             'harga_dasar' => $menu->harga_dasar,
-            'topping' => $toppings,
+            'topping' => $toppings->toArray(), // 🔥 penting
+            'jumlah' => 1,
             'subtotal' => $subtotal
         ];
 
@@ -68,85 +71,28 @@ class MenuController extends Controller
     }
 
     // ======================
-    // CHECKOUT PAGE
+    // HAPUS ITEM CART
     // ======================
-    public function checkout()
-    {
-        $cart = session()->get('cart', []);
-        $total = collect($cart)->sum('subtotal');
-
-        return view('checkout', compact('cart', 'total'));
-    }
-
-    // ======================
-    // PROSES CHECKOUT
-    // ======================
-    public function processCheckout(Request $request)
-    {
-        $cart = session()->get('cart', []);
-
-        if(empty($cart)){
-            return redirect('/');
-        }
-
-        $total = collect($cart)->sum('subtotal');
-
-        $pesanan = Pesanan::create([
-            'nama_pembeli' => $request->nama_pembeli,
-            'alamat' => $request->alamat,
-            'no_hp' => $request->no_hp,
-            'tipe_pengambilan' => $request->tipe_pengambilan,
-            'jam_ambil' => $request->jam_ambil,
-            'total_harga' => $total
-        ]);
-
-        foreach($cart as $item){
-            DetailPesanan::create([
-                'id_pesanan' => $pesanan->id_pesanan,
-                'id_menu' => $item['id_menu'],
-                'subtotal' => $item['subtotal']
-            ]);
-        }
-
-        session()->forget('cart');
-
-        return redirect('/')->with('success', 'Pesanan berhasil dibuat!');
-    }
     public function removeCart($index)
-{
-    $cart = session()->get('cart', []);
+    {
+        $cart = session()->get('cart', []);
 
-    if (isset($cart[$index])) {
-        unset($cart[$index]);
+        if (isset($cart[$index])) {
+            unset($cart[$index]);
+        }
+
+        $cart = array_values($cart); // rapikan index
+        session()->put('cart', $cart);
+
+        return redirect()->back();
     }
 
-    // rapikan index array
-    $cart = array_values($cart);
-
-    session()->put('cart', $cart);
-
-    return redirect()->back();
-}
-public function clearCart()
-{
-    session()->forget('cart');
-
-    return redirect()->back();
-}
-
-public function removeFromCart($index)
-{
-    $cart = session()->get('cart', []);
-
-    if (isset($cart[$index])) {
-        unset($cart[$index]);
+    // ======================
+    // CLEAR CART
+    // ======================
+    public function clearCart()
+    {
+        session()->forget('cart');
+        return redirect()->back();
     }
-
-    // rapihin ulang index array
-    $cart = array_values($cart);
-
-    session()->put('cart', $cart);
-
-    return redirect('/cart')->with('success', 'Item berhasil dihapus');
-}
 }

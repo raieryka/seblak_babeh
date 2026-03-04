@@ -43,22 +43,22 @@
             <div class="card-body text-dark">
 
                 {{-- Nama Menu --}}
-                <h5 class="fw-bold">{{ $item['nama_menu'] }}</h5>
+                <h5 class="fw-bold">{{ $item['nama_menu'] ?? '' }}</h5>
 
                 {{-- Harga dasar --}}
                 <p>
                     Harga Dasar :
-                    Rp {{ number_format($item['harga_dasar']) }}
+                    Rp {{ number_format($item['harga_dasar'] ?? 0) }}
                 </p>
 
                 {{-- TOPPING --}}
-                @if(count($item['topping']) > 0)
+                @if(!empty($item['topping']))
                     <p class="mb-1">Topping:</p>
                     <ul>
                         @foreach ($item['topping'] as $t)
                             <li>
-                                {{ $t->nama_topping }}
-                                (Rp {{ number_format($t->harga_topping) }})
+                                {{ $t['nama_topping'] ?? '' }}
+                                (Rp {{ number_format($t['harga_topping'] ?? 0) }})
                             </li>
                         @endforeach
                     </ul>
@@ -66,7 +66,7 @@
 
                 {{-- SUBTOTAL --}}
                 <p class="fw-bold text-danger">
-                    Subtotal: Rp {{ number_format($item['subtotal']) }}
+                    Subtotal: Rp {{ number_format($item['subtotal'] ?? 0) }}
                 </p>
 
                 {{-- HAPUS ITEM --}}
@@ -83,7 +83,7 @@
 
         {{-- TOTAL --}}
         <div class="card bg-danger text-white p-3">
-            <h4>Total: Rp {{ number_format($total) }}</h4>
+            <h4>Total: Rp {{ number_format($total ?? 0) }}</h4>
         </div>
 
         {{-- CHECKOUT --}}
