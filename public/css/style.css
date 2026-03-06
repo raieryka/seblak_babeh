@@ -1,0 +1,109 @@
+/* ============================= */
+/* HERO SECTION */
+/* ============================= */
+
+.hero-section {
+    height: 90vh;
+    background: linear-gradient(135deg, #7B0000, #B22222);
+    position: relative;
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================= */
+/* BADGE - BUKA SETIAP HARI */
+/* ============================= */
+
+.badge-custom {
+    background-color: #FF7A00;   /* OREN */
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ============================= */
+/* BUTTON CUSTOM */
+/* ============================= */
+
+.btn-custom {
+    background-color: #FF7A00;   /* OREN */
+    border: none;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: #FF9500;
+    transform: translateY(-3px);
+}
+
+/* ============================= */
+/* TEXT BABEH */
+/* ============================= */
+
+.text-babeh {
+    color: #FFA94D;   /* OREN SOFT */
+    font-weight: 600;
+}
+
+/* ============================= */
+/* KEUNGGULAN SECTION */
+/* ============================= */
+
+.keunggulan-section {
+    background: linear-gradient(135deg, #990000, #CC3300);
+    border-radius: 20px;
+    padding: 60px 0;
+}
+
+/* Card dalam keunggulan */
+.keunggulan-section .p-4 {
+    background: #B22222;   /* MERAH BEDA */
+    border-radius: 15px;
+    padding: 30px;
+    transition: 0.3s;
+}
+
+.keunggulan-section .p-4:hover {
+    transform: translateY(-6px);
+    background: #D62828;
+}
+
+/* Icon bulat */
+.icon-circle {
+    width: 90px;
+    height: 90px;
+    background: rgba(255,122,0,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    margin: auto;
+}
+
+/* ============================= */
+/* MENU CARD */
+/* ============================= */
+
+.menu-card {
+    transition: 0.3s;
+    border-radius: 15px;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+}
+
+
+/* Tambahkan ini di file CSS-mu, biasanya di public/css/app.css atau resources/css/app.css */

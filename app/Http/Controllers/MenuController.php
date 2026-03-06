@@ -37,26 +37,63 @@ class MenuController extends Controller
     {
         $menu = Menu::findOrFail($request->id_menu);
 
-        // ambil topping yang dipilih
-        $toppings = Topping::whereIn('id_topping', $request->topping ?? [])->get();
+        $toppings = Topping::whereIn(
+            'id_topping',
+            $request->topping ?? []
+        )->get();
 
         $cart = session()->get('cart', []);
 
+        $hargaDasar = $menu->harga_dasar;
         $totalTopping = $toppings->sum('harga_topping');
-        $subtotal = $menu->harga_dasar + $totalTopping;
+
+        $jumlah = 1;
+
+        $subtotal = ($hargaDasar + $totalTopping) * $jumlah;
 
         $cart[] = [
             'id_menu' => $menu->id_menu,
             'nama_menu' => $menu->nama_menu,
-            'harga_dasar' => $menu->harga_dasar,
-            'topping' => $toppings->toArray(), // 🔥 penting
-            'jumlah' => 1,
+            'harga_dasar' => $hargaDasar,
+            'topping' => $toppings->toArray(),
+            'jumlah' => $jumlah,
             'subtotal' => $subtotal
         ];
 
         session()->put('cart', $cart);
 
         return redirect('/cart');
+    }
+
+    // ======================
+    // UPDATE JUMLAH (+ / -)
+    // ======================
+    public function updateCart(Request $request, $index)
+    {
+        $cart = session()->get('cart', []);
+
+        if (!isset($cart[$index])) {
+            return redirect()->back();
+        }
+
+        $jumlahBaru = max(1, $request->jumlah);
+
+        $hargaDasar = $cart[$index]['harga_dasar'];
+
+        $totalTopping = 0;
+
+        if (!empty($cart[$index]['topping'])) {
+            $totalTopping = collect($cart[$index]['topping'])
+                ->sum('harga_topping');
+        }
+
+        $cart[$index]['jumlah'] = $jumlahBaru;
+        $cart[$index]['subtotal'] =
+            ($hargaDasar + $totalTopping) * $jumlahBaru;
+
+        session()->put('cart', $cart);
+
+        return redirect()->back();
     }
 
     // ======================
@@ -81,7 +118,7 @@ class MenuController extends Controller
             unset($cart[$index]);
         }
 
-        $cart = array_values($cart); // rapikan index
+        $cart = array_values($cart);
         session()->put('cart', $cart);
 
         return redirect()->back();

@@ -2,17 +2,35 @@
 <html>
 <head>
     <title>{{ $menu->nama_menu }}</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
+
+        /* ===== BACKGROUND PALING LUAR ===== */
+        body {
+            background: #7a0000; /* merah sama kayak tombol */
+            min-height: 100vh;
+        }
+
+        /* ===== INFO BOX PUTIH ===== */
+        .info-box {
+            background: #ffffff;
+            color: #000;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        /* ===== TOPPING CARD ===== */
         .topping-card {
             background: #ffffff;
             color: #000;
             border-radius: 15px;
-            transition: all 0.2s ease;
+            transition: 0.2s ease;
             border: none;
             padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
 
         .topping-card:hover {
@@ -32,29 +50,68 @@
             color: #dc3545;
             font-weight: 600;
         }
+
+        /* ===== TOMBOL TAMBAH MERAH ===== */
+        .btn-tambah {
+            background: #5a0000;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+        .btn-tambah:hover {
+            background: #3d0000;
+            transform: translateY(-2px);
+        }
+
     </style>
 </head>
 
-<body class="bg-dark text-white">
+<body>
 
 <div class="container mt-5">
 
     <a href="/" class="btn btn-light mb-3">← Kembali</a>
 
-    <div class="card bg-danger text-white shadow-lg">
+    <!-- CARD MERAH -->
+    <div class="card bg-danger text-white shadow-lg border-0">
+
         <div class="card-body">
 
-            {{-- FOTO MENU --}}
-            <img src="{{ asset('images/' . $menu->gambar) }}" 
+            {{-- FOTO --}}
+            <img src="{{ asset('images/' . $menu->gambar) }}"
                  class="img-fluid mb-3 rounded"
                  style="height:300px; object-fit:cover; width:100%;">
 
-            <h3>{{ $menu->nama_menu }}</h3>
+            {{-- INFO BOX PUTIH --}}
+            <div class="info-box mt-2 mb-3">
 
-            <p class="fs-5">
-                Harga Dasar: Rp 0
-            </p>
+                <h4 class="fw-bold">
+                    {{ $menu->nama_menu }}
+                </h4>
 
+                <p class="mb-1">
+                    💰 Harga:
+                    Rp {{ number_format($menu->harga_dasar) }}
+                </p>
+
+                @if(!empty($menu->deskripsi))
+                    <p class="mb-1">
+                        📝 {{ $menu->deskripsi }}
+                    </p>
+                @endif
+
+                <p class="mb-0">
+                    📦 Stok:
+                    {{ $menu->stok ?? 'Tidak diketahui' }}
+                </p>
+
+            </div>
+
+            {{-- FORM --}}
             <form action="/cart/add" method="POST">
                 @csrf
                 <input type="hidden" name="id_menu" value="{{ $menu->id_menu }}">
@@ -83,10 +140,14 @@
 
                             <button type="button"
                                     class="btn btn-sm btn-danger w-100 addTopping"
-                                    data-id="{{ $t->id_topping }}"
-                                    data-harga="{{ $t->harga_topping }}">
-                                + Keranjang
+                                    data-id="{{ $t->id_topping }}">
+                                + Pilih
                             </button>
+
+                            <input type="hidden"
+                                   name="topping[]"
+                                   value="{{ $t->id_topping }}"
+                                   class="topping-input d-none">
 
                         </div>
 
@@ -97,14 +158,9 @@
 
                 @endif
 
-                <h4 class="mt-4">
-                    Total: Rp <span id="totalHarga">0</span>
-                </h4>
-
-                <div id="selectedTopping"></div>
-
-                <button type="submit" class="btn btn-dark mt-3 w-100">
-                    ➕ Tambah+
+                {{-- TOMBOL TAMBAH --}}
+                <button type="submit" class="btn-tambah w-100 mt-3">
+                    ➕ Tambah ke Keranjang
                 </button>
 
             </form>
@@ -113,57 +169,6 @@
     </div>
 
 </div>
-
-<script>
-let total = 0;
-
-document.querySelectorAll('.addTopping').forEach(button => {
-
-    button.addEventListener('click', function() {
-
-        let harga = parseInt(this.dataset.harga);
-        let id = this.dataset.id;
-
-        // CEK APAKAH SUDAH DIPILIH
-        if (this.classList.contains('selected')) {
-
-            // KALAU SUDAH DIPILIH → HAPUS
-            total -= harga;
-            this.classList.remove("selected");
-            this.classList.remove("btn-success");
-            this.classList.add("btn-danger");
-            this.innerText = "+ Keranjang";
-
-            // HAPUS INPUT HIDDEN
-            document.querySelectorAll('input[name="topping[]"]').forEach(input => {
-                if (input.value == id) {
-                    input.remove();
-                }
-            });
-
-        } else {
-
-            // KALAU BELUM DIPILIH → TAMBAH
-            total += harga;
-            this.classList.add("selected");
-            this.classList.remove("btn-danger");
-            this.classList.add("btn-success");
-            this.innerText = "✓ Dipilih";
-
-            let input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "topping[]";
-            input.value = id;
-
-            document.getElementById('selectedTopping').appendChild(input);
-        }
-
-        // UPDATE TOTAL
-        document.getElementById('totalHarga').innerText = total.toLocaleString();
-    });
-
-});
-</script>
 
 </body>
 </html>

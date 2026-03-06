@@ -6,7 +6,7 @@ use App\Http\Controllers\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC ROUTES (BISA DIAKSES TANPA LOGIN)
+| PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
 
@@ -20,7 +20,16 @@ Route::post('/cart/clear', [MenuController::class, 'clearCart'])->name('cart.cle
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD (UNTUK REDIRECT SETELAH LOGIN)
+| TAMBAHAN ROUTE UPDATE (+ / -)
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/cart/update/{index}', [MenuController::class, 'updateCart'])
+    ->name('cart.update');
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD
 |--------------------------------------------------------------------------
 */
 
@@ -36,20 +45,28 @@ Route::get('/dashboard', [MenuController::class, 'index'])
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout/proses', [CheckoutController::class, 'proses'])->name('checkout.proses');
-    Route::get('/checkout/sukses/{id}', [CheckoutController::class, 'sukses'])->name('checkout.sukses');
-    Route::get('/riwayat', [CheckoutController::class, 'riwayat'])->name('riwayat');
+    Route::get('/checkout', [CheckoutController::class, 'index'])
+        ->name('checkout.index');
+
+    Route::post('/checkout/proses', [CheckoutController::class, 'proses'])
+        ->name('checkout.proses');
+
+    Route::get('/checkout/sukses/{id}', [CheckoutController::class, 'sukses'])
+        ->name('checkout.sukses');
+
+    Route::get('/riwayat', [CheckoutController::class, 'riwayat'])
+        ->name('riwayat');
 
 });
 
 /*
 |--------------------------------------------------------------------------
-| AUTH ROUTES (DARI BREEZE)
+| AUTH ROUTES
 |--------------------------------------------------------------------------
 */
 
 require __DIR__.'/auth.php';
+
 use Illuminate\Support\Facades\Auth;
 
 Route::post('/logout', function () {
