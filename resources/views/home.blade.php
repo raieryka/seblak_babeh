@@ -31,7 +31,6 @@
 <!-- ========================= -->
 <!-- SECTION KEUNGGULAN -->
 <!-- ========================= -->
-
 <section class="keunggulan-wrapper">
 
     <div class="container">
@@ -78,13 +77,20 @@
 
 
 <!-- ========================= -->
+<!-- SEARCH MENU -->
+<!-- ========================= -->
+<div class="container mb-4">
+    <input type="text" id="searchMenu" class="form-control search-menu-input" placeholder="🔍 Cari menu...">
+</div>
+
+
+<!-- ========================= -->
 <!-- DAFTAR MENU -->
 <!-- ========================= -->
-
 <div class="container mb-5" id="menu">
-    <div class="row">
+    <div class="row" id="menuList">
         @foreach($menu as $m)
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4 menu-item" data-name="{{ strtolower($m->nama_menu) }}">
             <div class="card shadow border-0 menu-card">
 
                 <img src="{{ asset('images/' . $m->gambar) }}"
@@ -97,7 +103,11 @@
                     </h5>
 
                     <p class="text-danger fw-bold">
-                        Rp {{ number_format($m->harga_dasar) }}
+                        @if($m->is_custom == 1)
+                            Harga menyesuaikan topping
+                        @else
+                            Rp {{ number_format($m->harga_dasar) }}
+                        @endif
                     </p>
 
                     <a href="{{ url('/menu/' . $m->id_menu) }}"
@@ -114,9 +124,35 @@
 
 
 <!-- ========================= -->
+<!-- SCRIPT FILTER -->
+<!-- ========================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const input = document.getElementById("searchMenu");
+
+    input.addEventListener("keyup", function() {
+        let value = input.value.toLowerCase();
+        let items = document.querySelectorAll(".menu-item");
+
+        items.forEach(function(item){
+            let name = item.getAttribute("data-name");
+
+            if(name.includes(value)){
+                item.style.display = "block";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+
+});
+</script>
+
+
+<!-- ========================= -->
 <!-- STYLE -->
 <!-- ========================= -->
-
 <style>
 
 /* Bubble status */
@@ -146,6 +182,14 @@
 .menu-bubble:hover {
     background: #ffb300;
     transform: scale(1.05);
+}
+
+/* Search Menu Lebih Besar */
+.search-menu-input {
+    font-size: 20px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 2px solid #dc3545;
 }
 
 /* WRAPPER JARAK */

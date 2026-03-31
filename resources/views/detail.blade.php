@@ -1,174 +1,227 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ $menu->nama_menu }}</title>
+<title>{{ $menu->nama_menu }}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
+<style>
+body{
+    background:#7a0000;
+    min-height:100vh;
+}
 
-        /* ===== BACKGROUND PALING LUAR ===== */
-        body {
-            background: #7a0000; /* merah sama kayak tombol */
-            min-height: 100vh;
-        }
+.info-box{
+    background:#fff;
+    color:#000;
+    border-radius:20px;
+    padding:20px;
+}
 
-        /* ===== INFO BOX PUTIH ===== */
-        .info-box {
-            background: #ffffff;
-            color: #000;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        }
+.topping-card{
+    background:#fff;
+    border-radius:15px;
+    padding:15px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    color:#000;
+}
 
-        /* ===== TOPPING CARD ===== */
-        .topping-card {
-            background: #ffffff;
-            color: #000;
-            border-radius: 15px;
-            transition: 0.2s ease;
-            border: none;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
+.topping-img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:10px;
+}
 
-        .topping-card:hover {
-            transform: translateY(-3px);
-        }
+.topping-price{
+    color:#dc3545;
+    font-weight:600;
+    font-size:14px;
+}
 
-        .topping-img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
+.pilih-btn{
+    background:#dc3545;
+    border:none;
+    color:#fff;
+    width:100%;
+    padding:8px;
+    border-radius:8px;
+    font-weight:bold;
+    transition:0.2s;
+}
 
-        .topping-price {
-            font-size: 14px;
-            color: #dc3545;
-            font-weight: 600;
-        }
+.pilih-btn.active{
+    background:#28a745;
+}
 
-        /* ===== TOMBOL TAMBAH MERAH ===== */
-        .btn-tambah {
-            background: #5a0000;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: bold;
-            transition: 0.2s ease;
-        }
+.btn-tambah{
+    background:#5a0000;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:12px;
+    font-weight:bold;
+}
 
-        .btn-tambah:hover {
-            background: #3d0000;
-            transform: translateY(-2px);
-        }
-
-    </style>
+.total-box{
+    background:#ffffff;
+    color:#000;
+    border-radius:15px;
+    padding:20px;
+    margin-top:20px;
+    text-align:center;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container mt-5">
 
-    <a href="/" class="btn btn-light mb-3">← Kembali</a>
+<a href="/" class="btn btn-light mb-3">← Kembali</a>
 
-    <!-- CARD MERAH -->
-    <div class="card bg-danger text-white shadow-lg border-0">
+<div class="card bg-danger text-white shadow border-0">
+<div class="card-body">
 
-        <div class="card-body">
+<img src="{{ asset('images/' . $menu->gambar) }}"
+class="img-fluid mb-3 rounded"
+style="height:300px; object-fit:cover; width:100%;">
 
-            {{-- FOTO --}}
-            <img src="{{ asset('images/' . $menu->gambar) }}"
-                 class="img-fluid mb-3 rounded"
-                 style="height:300px; object-fit:cover; width:100%;">
+<div class="info-box mb-3">
+<h4 class="fw-bold">{{ $menu->nama_menu }}</h4>
 
-            {{-- INFO BOX PUTIH --}}
-            <div class="info-box mt-2 mb-3">
+<p>💰 Harga :
+<b>
+@if($menu->is_custom == 1)
+    Harga menyesuaikan topping
+@else
+    Rp {{ number_format($menu->harga_dasar) }}
+@endif
+</b></p>
 
-                <h4 class="fw-bold">
-                    {{ $menu->nama_menu }}
-                </h4>
+@if(!empty($menu->deskripsi))
+<p>📝 {{ $menu->deskripsi }}</p>
+@endif
+</div>
 
-                <p class="mb-1">
-                    💰 Harga:
-                    Rp {{ number_format($menu->harga_dasar) }}
-                </p>
+<form action="/cart/add" method="POST">
+@csrf
+<input type="hidden" name="id_menu" value="{{ $menu->id_menu }}">
 
-                @if(!empty($menu->deskripsi))
-                    <p class="mb-1">
-                        📝 {{ $menu->deskripsi }}
-                    </p>
-                @endif
+@if($menu->is_custom == 1)
 
-                <p class="mb-0">
-                    📦 Stok:
-                    {{ $menu->stok ?? 'Tidak diketahui' }}
-                </p>
+<h5 class="mb-3">Pilih Topping :</h5>
 
-            </div>
+<!-- 🔍 Search Topping -->
+<div class="mb-3">
+    <input type="text" id="searchTopping" class="form-control" placeholder="🔍 Cari topping..." onkeyup="filterTopping()">
+</div>
 
-            {{-- FORM --}}
-            <form action="/cart/add" method="POST">
-                @csrf
-                <input type="hidden" name="id_menu" value="{{ $menu->id_menu }}">
+<div class="row">
+@foreach($topping as $t)
+<div class="col-md-6 col-lg-4 mb-4 topping-item" data-name="{{ strtolower($t->nama_topping) }}">
+<div class="topping-card">
 
-                @if($menu->is_custom == 1)
+<img src="{{ asset('images/topping_seblak/' . $t->gambar) }}"
+class="topping-img">
 
-                <h5 class="mt-4 mb-3">Pilih Topping:</h5>
+<div class="fw-bold mt-2" style="font-size:16px;">
+{{ $t->nama_topping }}
+</div>
 
-                <div class="row">
+<div class="topping-price mb-2">
+Rp {{ number_format($t->harga_topping) }}
+</div>
 
-                    @foreach($topping as $t)
-                    <div class="col-md-6 col-lg-4 mb-4">
+<button type="button"
+class="pilih-btn"
+data-harga="{{ $t->harga_topping }}"
+onclick="toggleTopping(this)">
+Tambah
+</button>
 
-                        <div class="topping-card">
+<input type="hidden"
+name="topping[]"
+value="{{ $t->id_topping }}"
+class="topping-input"
+disabled>
 
-                            <img src="{{ asset('images/topping_seblak/' . $t->gambar) }}"
-                                 class="topping-img">
-
-                            <div class="fw-bold">
-                                {{ $t->nama_topping }}
-                            </div>
-
-                            <div class="topping-price mb-2">
-                                Rp {{ number_format($t->harga_topping) }}
-                            </div>
-
-                            <button type="button"
-                                    class="btn btn-sm btn-danger w-100 addTopping"
-                                    data-id="{{ $t->id_topping }}">
-                                + Pilih
-                            </button>
-
-                            <input type="hidden"
-                                   name="topping[]"
-                                   value="{{ $t->id_topping }}"
-                                   class="topping-input d-none">
-
-                        </div>
-
-                    </div>
-                    @endforeach
-
-                </div>
-
-                @endif
-
-                {{-- TOMBOL TAMBAH --}}
-                <button type="submit" class="btn-tambah w-100 mt-3">
-                    ➕ Tambah ke Keranjang
-                </button>
-
-            </form>
-
-        </div>
-    </div>
+<input type="hidden"
+name="harga_topping[{{ $t->id_topping }}]"
+value="{{ $t->harga_topping }}"
+class="harga-topping-input"
+disabled>
 
 </div>
+</div>
+@endforeach
+</div>
+
+<!-- TOTAL HARGA -->
+<div class="total-box">
+<h5>Total Harga :
+<b id="totalHarga">Rp 0</b></h5>
+</div>
+
+<input type="hidden" name="total_harga" id="harga_total_input" value="0">
+
+@endif
+
+<button type="submit" class="btn-tambah w-100 mt-3">
+➕ Tambah ke Keranjang
+</button>
+
+</form>
+
+</div>
+</div>
+
+</div>
+
+@if($menu->is_custom == 1)
+<script>
+let totalTopping = 0;
+
+function rupiah(angka){
+    return "Rp " + angka.toLocaleString("id-ID");
+}
+
+function toggleTopping(btn){
+    let inputTopping = btn.nextElementSibling;
+    let hargaToppingInput = inputTopping.nextElementSibling;
+    let harga = parseInt(btn.dataset.harga);
+
+    if(btn.classList.contains("active")){
+        btn.classList.remove("active");
+        btn.innerHTML = "Tambah";
+        inputTopping.disabled = true;
+        hargaToppingInput.disabled = true;
+        totalTopping -= harga;
+    } else {
+        btn.classList.add("active");
+        btn.innerHTML = "✔ Ditambah";
+        inputTopping.disabled = false;
+        hargaToppingInput.disabled = false;
+        totalTopping += harga;
+    }
+
+    document.getElementById("totalHarga").innerHTML = rupiah(totalTopping);
+    document.getElementById("harga_total_input").value = totalTopping;
+}
+
+// 🔥 Filter Topping
+function filterTopping(){
+    let input = document.getElementById("searchTopping").value.toLowerCase();
+    let items = document.querySelectorAll(".topping-item");
+
+    items.forEach(function(item){
+        let name = item.getAttribute("data-name");
+        item.style.display = name.includes(input) ? "block" : "none";
+    });
+}
+</script>
+@endif
 
 </body>
 </html>

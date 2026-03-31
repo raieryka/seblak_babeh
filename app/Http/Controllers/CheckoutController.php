@@ -18,7 +18,7 @@ class CheckoutController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        $total = collect($cart)->sum('subtotal');
+        $total = collect($cart)->sum('subtotal'); // total sekarang sesuai topping
 
         return view('checkout', compact('cart', 'total'));
     }
@@ -75,7 +75,7 @@ class CheckoutController extends Controller
                 'id_menu' => $item['id_menu'],
                 'topping' => isset($item['topping']) ? json_encode($item['topping']) : null,
                 'jumlah' => $item['jumlah'],
-                'subtotal' => $item['subtotal'],
+                'subtotal' => $item['subtotal'], // 🔥 subtotal sesuai topping
             ]);
 
             // 🔥 KURANGI STOK
@@ -107,8 +107,8 @@ class CheckoutController extends Controller
     public function riwayat()
     {
         $pesanans = Pesanan::where('user_id', Auth::id())
-            ->latest()
-            ->get();
+                    ->orderBy('id_pesanan', 'desc') // pesanan terbaru muncul dulu
+                    ->get();
 
         return view('riwayat', compact('pesanans'));
     }
