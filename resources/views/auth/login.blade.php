@@ -18,6 +18,15 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
+            {{-- 🔥 ROLE (PINDAH KE DALAM FORM) --}}
+            <div class="mb-3">
+                <label>Login sebagai</label>
+                <select name="role" class="form-control">
+                    <option value="customer">Customer</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
             {{-- EMAIL --}}
             <div class="mb-3">
                 <label>Email</label>
@@ -40,7 +49,7 @@
 
         </form>
 
-        {{-- TAMBAHAN DAFTAR --}}
+        {{-- DAFTAR --}}
         <p class="text-center mt-3 mb-0">
             Belum punya akun?
             <a href="{{ route('register') }}" class="text-danger fw-bold">

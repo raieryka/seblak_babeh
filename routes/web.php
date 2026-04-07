@@ -29,13 +29,29 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-// PROSES LOGIN
+// 🔥 PROSES LOGIN (SUDAH SUPPORT ROLE)
 Route::post('/login', function (Request $request) {
+
     $credentials = $request->only('email', 'password');
+    $role = $request->role; // 🔥 ambil role dari form
 
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-        return redirect()->route('welcome'); // 🔥 FIX
+
+        // 🔥 CEK ROLE
+        if (Auth::user()->role != $role) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Login gagal! Role tidak sesuai.',
+            ]);
+        }
+
+        // 🔥 REDIRECT SESUAI ROLE
+        if ($role == 'admin') {
+            return redirect('/admin');
+        } else {
+            return redirect()->route('welcome');
+        }
     }
 
     return back()->withErrors([
@@ -50,6 +66,7 @@ Route::get('/register', function () {
 
 // PROSES REGISTER
 Route::post('/register', function (Request $request) {
+
     $request->validate([
         'name' => 'required',
         'email' => 'required|email|unique:users',
@@ -60,22 +77,38 @@ Route::post('/register', function (Request $request) {
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
+        'role' => 'customer' // 🔥 default customer
     ]);
 
     Auth::login($user);
 
-    return redirect()->route('welcome'); // 🔥 FIX
+    return redirect()->route('welcome');
 });
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN WELCOME (FULL SCREEN)
+| HALAMAN WELCOME
 |--------------------------------------------------------------------------
 */
 
 Route::get('/welcome', function () {
     return view('auth.welcome');
 })->middleware('auth')->name('welcome');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN PAGE
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/admin', function () {
+
+    if (Auth::user()->role != 'admin') {
+        abort(403); // 🔥 kalau bukan admin ditolak
+    }
+
+    return "HALAMAN ADMIN 😎";
+})->middleware('auth');
 
 /*
 |--------------------------------------------------------------------------
@@ -89,7 +122,7 @@ Route::post('/cart/remove/{index}', [MenuController::class, 'removeCart'])->name
 Route::post('/cart/clear', [MenuController::class, 'clearCart'])->name('cart.clear');
 Route::post('/cart/update/{index}', [MenuController::class, 'updateCart'])->name('cart.update');
 
-// 🔥 Tambahan: Edit topping
+// 🔥 Edit topping
 Route::get('/cart/edit/{index}', [MenuController::class, 'editCart'])->name('cart.edit');
 Route::post('/cart/edit/{index}', [MenuController::class, 'updateCartTopping'])->name('cart.edit.update');
 
