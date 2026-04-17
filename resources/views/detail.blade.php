@@ -134,12 +134,13 @@ class="topping-img">
 Rp {{ number_format($t->harga_topping) }}
 </div>
 
-<button type="button"
-class="pilih-btn"
-data-harga="{{ $t->harga_topping }}"
-onclick="toggleTopping(this)">
-Tambah
-</button>
+@if($t->stok <= 0)
+    <button type="button" class="btn btn-secondary w-100 fw-bold" disabled>Habis</button>
+@else
+    <button type="button" class="pilih-btn" data-harga="{{ $t->harga_topping ?? $t->harga }}" onclick="toggleTopping(this)">
+        Tambah
+    </button>
+@endif
 
 <input type="hidden"
 name="topping[]"
@@ -168,9 +169,15 @@ disabled>
 
 @endif
 
-<button type="submit" class="btn-tambah w-100 mt-3">
-➕ Tambah ke Keranjang
-</button>
+@if($menu->stok <= 0)
+    <button type="button" class="btn btn-secondary w-100 mt-3 fw-bold" disabled>
+        ✖ Menu Habis
+    </button>
+@else
+    <button type="submit" class="btn-tambah w-100 mt-3">
+        ➕ Tambah ke Keranjang
+    </button>
+@endif
 
 </form>
 

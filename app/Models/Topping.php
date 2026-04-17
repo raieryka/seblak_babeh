@@ -23,9 +23,10 @@ class Topping extends Model
     }
 
     protected $fillable = [
-    'nama_topping',
-    'harga',
-    'gambar',
-    'id_penjual'
+        'nama_topping',
+        'harga',
+        'gambar',
+        'id_penjual',
+        'stok'
     ];
 }

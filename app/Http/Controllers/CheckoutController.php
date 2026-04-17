@@ -50,6 +50,19 @@ class CheckoutController extends Controller
                     'Stok ' . $menu->nama_menu . ' tidak cukup!'
                 );
             }
+
+            // CEK STOK TOPPING
+            if (isset($item['topping']) && is_array($item['topping'])) {
+                foreach ($item['topping'] as $top) {
+                    $toppingModel = \App\Models\Topping::find($top['id_topping']);
+                    if ($toppingModel && $toppingModel->stok < $item['jumlah']) {
+                        return redirect()->back()->with(
+                            'error',
+                            'Stok topping ' . $toppingModel->nama_topping . ' tidak cukup!'
+                        );
+                    }
+                }
+            }
         }
 
         // ==========================
@@ -84,6 +97,17 @@ class CheckoutController extends Controller
             if ($menu) {
                 $menu->stok = $menu->stok - $item['jumlah'];
                 $menu->save();
+            }
+
+            // 🔥 KURANGI STOK TOPPING
+            if (isset($item['topping']) && is_array($item['topping'])) {
+                foreach ($item['topping'] as $top) {
+                    $toppingModel = \App\Models\Topping::find($top['id_topping']);
+                    if ($toppingModel) {
+                        $toppingModel->stok = $toppingModel->stok - $item['jumlah'];
+                        $toppingModel->save();
+                    }
+                }
             }
         }
 

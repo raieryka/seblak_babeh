@@ -110,10 +110,13 @@
                         @endif
                     </p>
 
-                    <a href="{{ url('/menu/' . $m->id_menu) }}"
-                       class="btn btn-danger w-100">
-                        Tambah Keranjang
-                    </a>
+                    @if($m->stok <= 0)
+                        <button class="btn btn-secondary w-100 fw-bold" disabled>Habis</button>
+                    @else
+                        <a href="{{ url('/menu/' . $m->id_menu) }}" class="btn btn-danger w-100 fw-bold">
+                            Tambah Keranjang
+                        </a>
+                    @endif
 
                 </div>
             </div>

@@ -101,14 +101,19 @@ Route::get('/welcome', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin', function () {
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/', [\App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
 
-    if (Auth::user()->role != 'admin') {
-        abort(403); // 🔥 kalau bukan admin ditolak
-    }
+    // Menu Management
+    Route::resource('menu', \App\Http\Controllers\AdminMenuController::class)->except(['show']);
 
-    return "HALAMAN ADMIN 😎";
-})->middleware('auth');
+    // Topping Management
+    Route::resource('topping', \App\Http\Controllers\AdminToppingController::class)->except(['show']);
+
+    // Pesanan Management
+    Route::get('pesanan', [\App\Http\Controllers\AdminPesananController::class, 'index'])->name('pesanan.index');
+    Route::get('pesanan/{id}', [\App\Http\Controllers\AdminPesananController::class, 'show'])->name('pesanan.show');
+});
 
 /*
 |--------------------------------------------------------------------------
